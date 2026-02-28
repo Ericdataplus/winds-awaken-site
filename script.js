@@ -1,335 +1,470 @@
 /* ═══════════════════════════════════════════════════════════
-   WINDS AWAKEN — Game Landing Page Scripts
-   Awwwards-level creative effects: cursor glow, tilt cards,
-   bioluminescent particles, mouse parallax, scroll reveals
+   WINDS AWAKEN — Three.js + GSAP Premium Landing Page
+   GPU-accelerated ocean, particles, bloom, scroll animations
    ═══════════════════════════════════════════════════════════ */
 
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+/* ─── Globals ────────────────────────────────────────────── */
+let mouse = { x: 0, y: 0, nx: 0, ny: 0 };
+let scrollY = 0;
+
+/* ─── Init Everything ────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-    initWindParticles();
+    initThreeHero();
+    initLenis();
+    initGSAP();
+    initCursorGlow();
     initNavigation();
-    initScrollAnimations();
     initLightbox();
     initNewsletterForm();
     initSmoothScroll();
-    initCursorGlow();
-    initTiltCards();
-    initMouseParallax();
-    initTextReveal();
 });
 
-/* ─── Custom Cursor Glow Trail ────────────────────────── */
-function initCursorGlow() {
-    // Skip on touch devices
-    if ('ontouchstart' in window) return;
-
-    const glow = document.createElement('div');
-    glow.id = 'cursor-glow';
-    document.body.appendChild(glow);
-
-    const trail = document.createElement('div');
-    trail.id = 'cursor-trail';
-    document.body.appendChild(trail);
-
-    let mouseX = -100, mouseY = -100;
-    let glowX = -100, glowY = -100;
-    let trailX = -100, trailY = -100;
-
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-
-    function animateCursor() {
-        // Smooth easing follow
-        glowX += (mouseX - glowX) * 0.15;
-        glowY += (mouseY - glowY) * 0.15;
-        trailX += (mouseX - trailX) * 0.08;
-        trailY += (mouseY - trailY) * 0.08;
-
-        glow.style.left = glowX + 'px';
-        glow.style.top = glowY + 'px';
-        trail.style.left = trailX + 'px';
-        trail.style.top = trailY + 'px';
-
-        requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
-
-    // Scale up over interactive elements
-    const interactives = document.querySelectorAll('a, button, .gallery-item, .feature-card, .world-card');
-    interactives.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            glow.classList.add('cursor-hover');
-        });
-        el.addEventListener('mouseleave', () => {
-            glow.classList.remove('cursor-hover');
-        });
-    });
-}
-
-/* ─── 3D Tilt Cards ───────────────────────────────────── */
-function initTiltCards() {
-    const cards = document.querySelectorAll('.feature-card, .world-card');
-
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateX = ((y - centerY) / centerY) * -8;
-            const rotateY = ((x - centerX) / centerX) * 8;
-
-            card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px) scale(1.02)`;
-
-            // Move the highlight glow
-            const glowEl = card.querySelector('.card-glow');
-            if (glowEl) {
-                glowEl.style.left = x + 'px';
-                glowEl.style.top = y + 'px';
-                glowEl.style.opacity = '0.4';
-            }
-        });
-
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-            card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-            const glowEl = card.querySelector('.card-glow');
-            if (glowEl) glowEl.style.opacity = '0';
-            setTimeout(() => { card.style.transition = ''; }, 500);
-        });
-
-        // Add glow element if it doesn't exist
-        if (!card.querySelector('.card-glow')) {
-            const glowDiv = document.createElement('div');
-            glowDiv.className = 'card-glow';
-            card.appendChild(glowDiv);
-        }
-    });
-}
-
-/* ─── Mouse-Reactive Hero Parallax ────────────────────── */
-function initMouseParallax() {
-    const hero = document.getElementById('hero');
-    const heroImg = document.querySelector('.hero-img');
-    const heroLogo = document.getElementById('hero-logo');
-    if (!hero || !heroImg) return;
-
-    let targetX = 0, targetY = 0;
-    let currentX = 0, currentY = 0;
-
-    hero.addEventListener('mousemove', (e) => {
-        const rect = hero.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        targetX = x;
-        targetY = y;
-    });
-
-    function animateParallax() {
-        currentX += (targetX - currentX) * 0.05;
-        currentY += (targetY - currentY) * 0.05;
-
-        if (heroImg) {
-            const scrollY = window.scrollY;
-            const baseScale = 1.05 + scrollY * 0.0001;
-            heroImg.style.transform = `scale(${baseScale}) translate(${currentX * -20}px, ${currentY * -15 + scrollY * 0.15}px)`;
-        }
-        if (heroLogo) {
-            heroLogo.style.transform = `translate(${currentX * 10}px, ${currentY * 8}px)`;
-        }
-
-        requestAnimationFrame(animateParallax);
-    }
-    animateParallax();
-}
-
-/* ─── Scroll-Driven Text Reveal ───────────────────────── */
-function initTextReveal() {
-    // Split section header h2 text into individual characters for reveal
-    document.querySelectorAll('.section-header h2').forEach(h2 => {
-        const text = h2.textContent;
-        h2.innerHTML = '';
-        h2.setAttribute('aria-label', text);
-
-        text.split('').forEach((char, i) => {
-            const span = document.createElement('span');
-            span.className = 'char-reveal';
-            span.textContent = char === ' ' ? '\u00A0' : char;
-            span.style.animationDelay = `${i * 0.03}s`;
-            span.style.setProperty('--char-index', i);
-            h2.appendChild(span);
-        });
-    });
-
-    // Observe h2 elements to trigger the animation
-    const charObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('chars-visible');
-            }
-        });
-    }, { threshold: 0.3 });
-
-    document.querySelectorAll('.section-header h2').forEach(h2 => {
-        charObserver.observe(h2);
-    });
-}
-
-/* ─── Bioluminescent Wind Particle System ─────────────── */
-function initWindParticles() {
-    const canvas = document.getElementById('wind-particles');
+/* ═══════════════════════════════════════════════════════════
+   THREE.JS HERO SCENE
+   ═══════════════════════════════════════════════════════════ */
+function initThreeHero() {
+    const canvas = document.getElementById('hero-canvas');
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    let width, height;
-    let mouseX = -1000, mouseY = -1000;
+    // Scene
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x0a0e1a, 0.015);
 
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+    // Camera
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 8, 20);
+    camera.lookAt(0, 0, 0);
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+
+    // ─── Ocean Plane ─────────────────────────────────────
+    const oceanGeo = new THREE.PlaneGeometry(80, 80, 128, 128);
+    const oceanMat = new THREE.ShaderMaterial({
+        uniforms: {
+            uTime: { value: 0 },
+            uColor1: { value: new THREE.Color(0x0a2a3a) },
+            uColor2: { value: new THREE.Color(0x1affcc) },
+            uMouseX: { value: 0 },
+            uMouseY: { value: 0 },
+        },
+        vertexShader: `
+            uniform float uTime;
+            uniform float uMouseX;
+            uniform float uMouseY;
+            varying vec2 vUv;
+            varying float vElevation;
+
+            void main() {
+                vUv = uv;
+                vec3 pos = position;
+
+                // Layered waves
+                float wave1 = sin(pos.x * 0.3 + uTime * 0.8) * 0.8;
+                float wave2 = sin(pos.y * 0.5 + uTime * 0.6) * 0.5;
+                float wave3 = sin((pos.x + pos.y) * 0.2 + uTime * 1.2) * 0.3;
+                float mouseWave = sin(distance(pos.xy, vec2(uMouseX * 20.0, uMouseY * 20.0)) * 0.5 - uTime * 2.0) * 0.3;
+
+                pos.z = wave1 + wave2 + wave3 + mouseWave;
+                vElevation = pos.z;
+
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+            }
+        `,
+        fragmentShader: `
+            uniform vec3 uColor1;
+            uniform vec3 uColor2;
+            uniform float uTime;
+            varying vec2 vUv;
+            varying float vElevation;
+
+            void main() {
+                // Mix colors based on elevation
+                float mixFactor = smoothstep(-1.0, 1.5, vElevation);
+                vec3 color = mix(uColor1, uColor2, mixFactor * 0.4);
+
+                // Shimmer on wave peaks
+                float shimmer = smoothstep(0.5, 1.5, vElevation) * 0.3;
+                color += vec3(0.1, 1.0, 0.8) * shimmer;
+
+                // Distance fade
+                float dist = length(vUv - 0.5);
+                float fade = smoothstep(0.6, 0.3, dist);
+
+                gl_FragColor = vec4(color, fade * 0.7);
+            }
+        `,
+        transparent: true,
+        side: THREE.DoubleSide,
     });
 
-    function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+    const ocean = new THREE.Mesh(oceanGeo, oceanMat);
+    ocean.rotation.x = -Math.PI / 2;
+    ocean.position.y = -3;
+    scene.add(ocean);
+
+    // ─── Bioluminescent Particle System ──────────────────
+    const particleCount = 600;
+    const particleGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
+    const speeds = new Float32Array(particleCount);
+    const phases = new Float32Array(particleCount);
+
+    const colorPalette = [
+        new THREE.Color(0x1affcc), // teal
+        new THREE.Color(0x00dcff), // aqua
+        new THREE.Color(0xf0c850), // gold
+        new THREE.Color(0xff69b4), // pink
+        new THREE.Color(0x50ff80), // green
+    ];
+
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        positions[i3] = (Math.random() - 0.5) * 60;
+        positions[i3 + 1] = Math.random() * 25 - 5;
+        positions[i3 + 2] = (Math.random() - 0.5) * 60;
+
+        const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+        colors[i3] = color.r;
+        colors[i3 + 1] = color.g;
+        colors[i3 + 2] = color.b;
+
+        sizes[i] = Math.random() * 3 + 1;
+        speeds[i] = Math.random() * 0.5 + 0.2;
+        phases[i] = Math.random() * Math.PI * 2;
     }
 
-    class BioParticle {
-        constructor() {
-            this.reset();
-        }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    particleGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
-        reset() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
-            this.baseSize = Math.random() * 3 + 0.5;
-            this.size = this.baseSize;
-            this.speedX = Math.random() * 1.2 + 0.2;
-            this.speedY = (Math.random() - 0.5) * 0.4;
-            this.opacity = Math.random() * 0.5 + 0.1;
-            // Bioluminescent colors: teal, aqua, gold, pink, green
-            const colors = [
-                { h: 170, s: 80, l: 65 }, // teal
-                { h: 190, s: 90, l: 70 }, // aqua
-                { h: 48, s: 85, l: 65 },  // gold
-                { h: 320, s: 70, l: 70 }, // pink
-                { h: 140, s: 75, l: 60 }, // green
-            ];
-            this.color = colors[Math.floor(Math.random() * colors.length)];
-            this.life = Math.random() * 300 + 150;
-            this.maxLife = this.life;
-            this.wobbleSpeed = Math.random() * 0.015 + 0.003;
-            this.wobbleAmp = Math.random() * 25 + 8;
-            this.angle = Math.random() * Math.PI * 2;
-            this.pulseSpeed = Math.random() * 0.03 + 0.01;
-            this.pulsePhase = Math.random() * Math.PI * 2;
-        }
+    const particleMat = new THREE.ShaderMaterial({
+        uniforms: {
+            uTime: { value: 0 },
+            uPixelRatio: { value: renderer.getPixelRatio() },
+        },
+        vertexShader: `
+            attribute float size;
+            uniform float uTime;
+            uniform float uPixelRatio;
+            varying vec3 vColor;
 
-        update() {
-            this.x += this.speedX;
-            this.angle += this.wobbleSpeed;
-            this.y += this.speedY + Math.sin(this.angle) * 0.25;
-            this.life--;
+            void main() {
+                vColor = color;
+                vec3 pos = position;
 
-            // Pulsing glow
-            this.size = this.baseSize + Math.sin(this.pulsePhase + performance.now() * this.pulseSpeed * 0.001) * this.baseSize * 0.4;
+                // Gentle floating motion
+                pos.y += sin(uTime * 0.5 + position.x * 0.1) * 0.5;
+                pos.x += cos(uTime * 0.3 + position.z * 0.1) * 0.3;
 
-            // React to mouse — glow brighter & drift away gently
-            const dx = this.x - mouseX;
-            const dy = this.y - mouseY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 150) {
-                const force = (150 - dist) / 150;
-                this.x += (dx / dist) * force * 0.8;
-                this.y += (dy / dist) * force * 0.5;
-                this.size = this.baseSize + force * 3;
+                vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+                gl_PointSize = size * uPixelRatio * (80.0 / -mvPos.z);
+                gl_Position = projectionMatrix * mvPos;
             }
+        `,
+        fragmentShader: `
+            varying vec3 vColor;
 
-            if (this.x > width + 10 || this.life <= 0) {
-                this.reset();
-                this.x = -10;
+            void main() {
+                float dist = distance(gl_PointCoord, vec2(0.5));
+                if (dist > 0.5) discard;
+
+                // Soft glow falloff
+                float glow = 1.0 - smoothstep(0.0, 0.5, dist);
+                glow = pow(glow, 1.5);
+
+                gl_FragColor = vec4(vColor, glow * 0.7);
             }
-        }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true,
+    });
 
-        draw() {
-            const fadeRatio = Math.min(this.life / this.maxLife, (this.maxLife - this.life) / 25);
-            const alpha = this.opacity * Math.min(fadeRatio, 1);
-            const { h, s, l } = this.color;
+    const particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
 
-            ctx.save();
-            ctx.globalAlpha = alpha;
+    // ─── Ambient Lights ──────────────────────────────────
+    const ambientLight = new THREE.AmbientLight(0x1a3050, 0.5);
+    scene.add(ambientLight);
 
-            // Outer glow
-            ctx.shadowBlur = this.size * 8;
-            ctx.shadowColor = `hsla(${h}, ${s}%, ${l}%, 0.6)`;
-            ctx.fillStyle = `hsla(${h}, ${s}%, ${l + 15}%, 1)`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
+    const pointLight1 = new THREE.PointLight(0x1affcc, 2, 50);
+    pointLight1.position.set(10, 10, 5);
+    scene.add(pointLight1);
 
-            // Inner bright core
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = `hsla(${h}, ${s - 10}%, ${Math.min(l + 30, 95)}%, 0.9)`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size * 0.4, 0, Math.PI * 2);
-            ctx.fill();
+    const pointLight2 = new THREE.PointLight(0xf0c850, 1.5, 40);
+    pointLight2.position.set(-10, 8, -5);
+    scene.add(pointLight2);
 
-            ctx.restore();
-        }
-    }
+    // ─── Post-Processing (Bloom) ─────────────────────────
+    const composer = new EffectComposer(renderer);
+    const renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
 
-    function init() {
-        resize();
-        particles = [];
-        const count = Math.min(Math.floor(width * height / 12000), 100);
-        for (let i = 0; i < count; i++) {
-            particles.push(new BioParticle());
-        }
-    }
+    const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        0.8,  // strength
+        0.4,  // radius
+        0.85  // threshold
+    );
+    composer.addPass(bloomPass);
+
+    // ─── Mouse Tracking ──────────────────────────────────
+    document.addEventListener('mousemove', (e) => {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    // ─── Resize ──────────────────────────────────────────
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ─── Animation Loop ─────────────────────────────────
+    const clock = new THREE.Clock();
 
     function animate() {
-        ctx.clearRect(0, 0, width, height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
         requestAnimationFrame(animate);
+
+        const elapsed = clock.getElapsedTime();
+
+        // Smooth mouse follow
+        mouse.nx += (mouse.x - mouse.nx) * 0.05;
+        mouse.ny += (mouse.y - mouse.ny) * 0.05;
+
+        // Update ocean
+        oceanMat.uniforms.uTime.value = elapsed;
+        oceanMat.uniforms.uMouseX.value = mouse.nx;
+        oceanMat.uniforms.uMouseY.value = mouse.ny;
+
+        // Update particles
+        particleMat.uniforms.uTime.value = elapsed;
+
+        // Animate particle positions for drifting
+        const posArr = particleGeo.attributes.position.array;
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+            posArr[i3] += speeds[i] * 0.02;
+            posArr[i3 + 1] += Math.sin(elapsed * speeds[i] + phases[i]) * 0.005;
+
+            // Wrap around
+            if (posArr[i3] > 30) posArr[i3] = -30;
+        }
+        particleGeo.attributes.position.needsUpdate = true;
+
+        // Camera reacts to mouse
+        camera.position.x += (mouse.nx * 3 - camera.position.x) * 0.02;
+        camera.position.y += (8 + mouse.ny * 2 - camera.position.y) * 0.02;
+        camera.lookAt(0, 0, 0);
+
+        // Fade scene on scroll
+        const heroHeight = window.innerHeight;
+        const scrollFade = Math.max(0, 1 - scrollY / heroHeight);
+        renderer.domElement.style.opacity = scrollFade;
+
+        // Render with bloom
+        composer.render();
     }
 
-    window.addEventListener('resize', resize);
-    init();
     animate();
 }
 
-/* ─── Navigation ──────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   LENIS SMOOTH SCROLL
+   ═══════════════════════════════════════════════════════════ */
+function initLenis() {
+    if (typeof Lenis === 'undefined') return;
+
+    const lenis = new Lenis({
+        duration: 1.4,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        direction: 'vertical',
+        gestureDirection: 'vertical',
+        smooth: true,
+        mouseMultiplier: 1,
+        smoothTouch: false,
+        touchMultiplier: 2,
+        infinite: false,
+    });
+
+    lenis.on('scroll', (e) => {
+        scrollY = e.scroll;
+
+        // Fade scroll hint
+        const hint = document.getElementById('scroll-hint');
+        if (hint) {
+            hint.style.opacity = Math.max(0, 1 - scrollY / 200);
+        }
+    });
+
+    function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Connect to GSAP ScrollTrigger
+    if (typeof ScrollTrigger !== 'undefined') {
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GSAP SCROLL ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+function initGSAP() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Animate all [data-animate] elements
+    document.querySelectorAll('[data-animate]').forEach(el => {
+        const type = el.getAttribute('data-animate');
+        const delay = parseFloat(el.getAttribute('data-delay') || 0) * 0.12;
+
+        const from = { opacity: 0 };
+        if (type === 'fade-up') from.y = 50;
+        if (type === 'slide-left') from.x = -60;
+        if (type === 'slide-right') from.x = 60;
+
+        gsap.from(el, {
+            ...from,
+            duration: 1,
+            delay,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 85%',
+                end: 'bottom 20%',
+                toggleActions: 'play none none none',
+            },
+        });
+    });
+
+    // Parallax on world card images
+    document.querySelectorAll('.world-img-wrapper img').forEach(img => {
+        gsap.to(img, {
+            yPercent: -15,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: img.closest('.world-card'),
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1,
+            },
+        });
+    });
+
+    // Hero logo parallax on scroll
+    const heroLogo = document.getElementById('hero-logo');
+    if (heroLogo) {
+        gsap.to(heroLogo, {
+            y: -80,
+            opacity: 0,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '#hero',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: 1,
+            },
+        });
+    }
+
+    // Section labels slide in
+    gsap.utils.toArray('.section-label').forEach(label => {
+        gsap.from(label, {
+            x: -30,
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: label,
+                start: 'top 85%',
+            },
+        });
+    });
+
+    // Stats count up
+    document.querySelectorAll('.stat-number').forEach(stat => {
+        const text = stat.textContent;
+        const num = parseInt(text);
+        if (!isNaN(num)) {
+            const obj = { val: 0 };
+            gsap.to(obj, {
+                val: num,
+                duration: 2,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: stat,
+                    start: 'top 85%',
+                },
+                onUpdate: () => {
+                    stat.textContent = Math.round(obj.val);
+                },
+            });
+        }
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CURSOR GLOW
+   ═══════════════════════════════════════════════════════════ */
+function initCursorGlow() {
+    if ('ontouchstart' in window) return;
+
+    const glow = document.getElementById('cursor-glow');
+    if (!glow) return;
+
+    let glowX = -300, glowY = -300;
+
+    document.addEventListener('mousemove', (e) => {
+        glowX = e.clientX;
+        glowY = e.clientY;
+    });
+
+    function animate() {
+        glow.style.left = glowX + 'px';
+        glow.style.top = glowY + 'px';
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════════════ */
 function initNavigation() {
     const nav = document.getElementById('main-nav');
     const toggle = document.getElementById('nav-toggle');
     const links = document.querySelector('.nav-links');
 
-    let lastScrollY = 0;
-    let ticking = false;
-
-    function onScroll() {
-        lastScrollY = window.scrollY;
-        if (!ticking) {
-            requestAnimationFrame(() => {
-                if (lastScrollY > 50) {
-                    nav.classList.add('scrolled');
-                } else {
-                    nav.classList.remove('scrolled');
-                }
-                ticking = false;
-            });
-            ticking = true;
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
         }
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
+    }, { passive: true });
 
     if (toggle) {
         toggle.addEventListener('click', () => {
@@ -345,76 +480,34 @@ function initNavigation() {
         });
     });
 
+    // Active link
     const sections = document.querySelectorAll('section[id]');
-
-    function highlightActiveLink() {
-        const scrollPos = window.scrollY + 100;
+    window.addEventListener('scroll', () => {
+        const pos = window.scrollY + 100;
         sections.forEach(section => {
             const top = section.offsetTop;
-            const height = section.offsetHeight;
+            const h = section.offsetHeight;
             const id = section.getAttribute('id');
             const link = document.querySelector(`.nav-link[href="#${id}"]`);
-
-            if (link && scrollPos >= top && scrollPos < top + height) {
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
+            if (link) {
+                if (pos >= top && pos < top + h) {
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
             }
         });
-    }
-
-    window.addEventListener('scroll', highlightActiveLink, { passive: true });
+    }, { passive: true });
 }
 
-/* ─── Scroll Reveal Animations ────────────────────────── */
-function initScrollAnimations() {
-    const revealSelectors = [
-        '.section-header',
-        '.feature-card',
-        '.world-card',
-        '.gallery-item',
-        '.buy-container',
-        '.newsletter-container'
-    ];
-
-    revealSelectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach((el, i) => {
-            el.classList.add('reveal');
-            el.style.transitionDelay = `${i * 0.08}s`;
-        });
-    });
-
-    const aboutText = document.querySelector('.about-text');
-    const aboutVisual = document.querySelector('.about-visual');
-    if (aboutText) aboutText.classList.add('reveal-left');
-    if (aboutVisual) aboutVisual.classList.add('reveal-right');
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    });
-
-    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
-        observer.observe(el);
-    });
-}
-
-/* ─── Lightbox ────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   LIGHTBOX
+   ═══════════════════════════════════════════════════════════ */
 function initLightbox() {
     const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const lightboxCaption = document.getElementById('lightbox-caption');
-    const lightboxClose = document.getElementById('lightbox-close');
-    const lightboxPrev = document.getElementById('lightbox-prev');
-    const lightboxNext = document.getElementById('lightbox-next');
-
     if (!lightbox) return;
 
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
     const galleryItems = document.querySelectorAll('.gallery-item');
     let currentIndex = 0;
     const images = [];
@@ -422,13 +515,11 @@ function initLightbox() {
     galleryItems.forEach((item, index) => {
         const img = item.querySelector('img');
         const caption = item.querySelector('.gallery-caption');
-
         images.push({
             src: img.src,
             alt: img.alt,
             caption: caption ? caption.textContent : ''
         });
-
         item.addEventListener('click', () => {
             currentIndex = index;
             openLightbox();
@@ -449,17 +540,8 @@ function initLightbox() {
         document.body.style.overflow = '';
     }
 
-    function showPrev() {
-        currentIndex = (currentIndex - 1 + images.length) % images.length;
-        updateLightbox();
-    }
-
-    function showNext() {
-        currentIndex = (currentIndex + 1) % images.length;
-        updateLightbox();
-    }
-
-    function updateLightbox() {
+    function navigate(dir) {
+        currentIndex = (currentIndex + dir + images.length) % images.length;
         const data = images[currentIndex];
         lightboxImg.style.opacity = '0';
         setTimeout(() => {
@@ -470,23 +552,21 @@ function initLightbox() {
         }, 200);
     }
 
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightboxPrev.addEventListener('click', showPrev);
-    lightboxNext.addEventListener('click', showNext);
-
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
-    });
-
+    document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+    document.getElementById('lightbox-prev').addEventListener('click', () => navigate(-1));
+    document.getElementById('lightbox-next').addEventListener('click', () => navigate(1));
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
     document.addEventListener('keydown', (e) => {
         if (!lightbox.classList.contains('active')) return;
         if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowLeft') showPrev();
-        if (e.key === 'ArrowRight') showNext();
+        if (e.key === 'ArrowLeft') navigate(-1);
+        if (e.key === 'ArrowRight') navigate(1);
     });
 }
 
-/* ─── Newsletter Form ─────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   NEWSLETTER
+   ═══════════════════════════════════════════════════════════ */
 function initNewsletterForm() {
     const form = document.getElementById('newsletter-form');
     if (!form) return;
@@ -495,16 +575,15 @@ function initNewsletterForm() {
         e.preventDefault();
         const email = document.getElementById('newsletter-email');
         const btn = document.getElementById('newsletter-submit');
-
         if (!email.value) return;
 
         const originalText = btn.textContent;
         btn.textContent = '✓ Saved!';
         btn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
 
-        const subscribers = JSON.parse(localStorage.getItem('wa_subscribers') || '[]');
-        subscribers.push({ email: email.value, date: new Date().toISOString() });
-        localStorage.setItem('wa_subscribers', JSON.stringify(subscribers));
+        const subs = JSON.parse(localStorage.getItem('wa_subscribers') || '[]');
+        subs.push({ email: email.value, date: new Date().toISOString() });
+        localStorage.setItem('wa_subscribers', JSON.stringify(subs));
         email.value = '';
 
         setTimeout(() => {
@@ -514,24 +593,20 @@ function initNewsletterForm() {
     });
 }
 
-/* ─── Smooth Scroll ───────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   SMOOTH SCROLL ANCHORS
+   ═══════════════════════════════════════════════════════════ */
 function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-
-            const target = document.querySelector(targetId);
+            const id = this.getAttribute('href');
+            if (id === '#') return;
+            const target = document.querySelector(id);
             if (!target) return;
-
             e.preventDefault();
-            const navHeight = document.getElementById('main-nav').offsetHeight;
-            const targetPosition = target.getBoundingClientRect().top + window.scrollY - navHeight;
-
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
+            const navH = document.getElementById('main-nav').offsetHeight;
+            const top = target.getBoundingClientRect().top + window.scrollY - navH;
+            window.scrollTo({ top, behavior: 'smooth' });
         });
     });
 }

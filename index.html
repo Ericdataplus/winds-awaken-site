@@ -22,367 +22,299 @@
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="images/game_logo.png">
+
+    <!-- Three.js & Add-ons via Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+        }
+    }
+    </script>
 </head>
 
 <body>
-    <!-- Wind particles canvas -->
-    <canvas id="wind-particles"></canvas>
-
-    <!-- Navigation -->
+    <!-- ═══ Navigation ═══ -->
     <nav id="main-nav">
         <div class="nav-inner">
             <a href="#" class="nav-logo">
-                <img src="images/game_logo.png" alt="Winds Awaken Logo" class="nav-logo-img">
+                <img src="images/game_logo.png" alt="Winds Awaken" id="nav-logo-img">
             </a>
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
             <div class="nav-links">
                 <a href="#about" class="nav-link">About</a>
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#worlds" class="nav-link">Worlds</a>
                 <a href="#gallery" class="nav-link">Gallery</a>
-                <a href="#buy" class="nav-link nav-cta">Coming Soon</a>
+                <a href="#buy" class="nav-cta">Coming Soon</a>
             </div>
-            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
-                <span></span><span></span><span></span>
-            </button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- ═══ Hero — Three.js Canvas ═══ -->
     <section id="hero">
-        <div class="hero-bg">
-            <img src="images/image2.png" alt="Winds Awaken — Floating Islands" class="hero-img">
-            <div class="hero-overlay"></div>
-        </div>
+        <canvas id="hero-canvas"></canvas>
         <div class="hero-content">
             <img src="images/game_logo.png" alt="Winds Awaken" class="hero-logo" id="hero-logo">
             <p class="hero-tagline">A Cel-Shaded Ocean Adventure</p>
-            <p class="hero-sub">Explore 60 floating islands across 6 breathtaking biomes.<br>Collect coins, uncover
+            <p class="hero-desc">Explore 60 floating islands across 6 breathtaking biomes.<br>Collect coins, uncover
                 secrets, and ride the winds.</p>
-            <div class="hero-actions">
-                <a href="#buy" class="btn btn-primary" id="hero-buy-btn">
-                    <span class="btn-icon">🎮</span>
-                    Coming Soon — $5
+            <div class="hero-buttons">
+                <a href="#buy" class="btn btn-primary">
+                    <span class="btn-icon">🎮</span> Coming Soon — $5
                 </a>
-                <a href="#gallery" class="btn btn-secondary" id="hero-trailer-btn">
-                    <span class="btn-icon">▶</span>
-                    View Screenshots
+                <a href="#gallery" class="btn btn-ghost">
+                    <span class="btn-icon">▶</span> View Screenshots
                 </a>
             </div>
             <div class="hero-platforms">
-                <span class="platform-badge" id="platform-windows">🪟 Windows</span>
-                <span class="platform-badge" id="platform-mac">🍎 Mac</span>
-                <span class="platform-badge" id="platform-linux">🐧 Linux</span>
+                <span class="platform-tag">🪟 Windows</span>
+                <span class="platform-tag">🍎 Mac</span>
+                <span class="platform-tag">🐧 Linux</span>
             </div>
         </div>
-        <div class="hero-scroll-indicator" id="scroll-indicator">
+        <div class="hero-scroll-hint" id="scroll-hint">
             <span>Scroll to explore</span>
             <div class="scroll-arrow"></div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about">
-        <div class="section-inner">
-            <div class="section-header">
-                <span class="section-label">The Adventure</span>
-                <h2>What is Winds Awaken?</h2>
-            </div>
+    <!-- ═══ About ═══ -->
+    <section id="about" class="section">
+        <div class="container">
             <div class="about-grid">
-                <div class="about-text">
-                    <p class="about-lead">An ocean-spanning adventure inspired by the timeless charm of <strong>The Wind
-                            Waker</strong> and the cozy spirit of <strong>A Short Hike</strong>.</p>
-                    <p>Set sail across a vast ocean dotted with mystical floating islands. Each island is a handcrafted
-                        platforming challenge filled with collectibles, hidden paths, and breathtaking scenery. Master
+                <div class="about-text" data-animate="slide-left">
+                    <span class="section-label">About the Game</span>
+                    <h2>Sail Across a<br><span class="text-gradient">Mystical Ocean</span></h2>
+                    <p>Winds Awaken is a cel-shaded 3D platformer inspired by The Wind Waker and A Short Hike. Master
                         the winds, unlock the Phase Shift ability to transform into a wind spirit, and discover the
-                        secrets that bind these islands together.</p>
-                    <p>With 60 levels spread across 6 unique biomes — from sun-kissed tropical beaches to the fiery
-                        heart of volcanic mountains — every island tells a story.</p>
+                        secrets that bind the floating islands together.</p>
+                    <div class="about-stats">
+                        <div class="stat">
+                            <span class="stat-number">60</span>
+                            <span class="stat-label">Levels</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">6</span>
+                            <span class="stat-label">Biomes</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">∞</span>
+                            <span class="stat-label">Secrets</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="about-visual">
-                    <img src="images/title-screen.png" alt="Winds Awaken Title Screen" class="about-img">
-                    <div class="about-img-glow"></div>
+                <div class="about-visual" data-animate="slide-right">
+                    <div class="about-image-frame">
+                        <img src="images/title-screen.png" alt="Winds Awaken Title Screen" loading="lazy">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features">
-        <div class="section-inner">
-            <div class="section-header">
-                <span class="section-label">Gameplay</span>
-                <h2>Core Features</h2>
+    <!-- ═══ Features ═══ -->
+    <section id="features" class="section section-dark">
+        <div class="container">
+            <div class="section-header" data-animate="fade-up">
+                <span class="section-label">Core Mechanics</span>
+                <h2>Built for <span class="text-gradient">Adventure</span></h2>
             </div>
             <div class="features-grid">
-                <div class="feature-card" id="feature-platforming">
+                <div class="feature-card" data-animate="fade-up" data-delay="0">
                     <div class="feature-icon">🏔️</div>
                     <h3>Precision Platforming</h3>
-                    <p>Double jumps, wall slides, wall jumps, dashes, and ground pounds. A movement system that feels
-                        crisp and satisfying.</p>
+                    <p>Double jumps, wall slides, wall jumps, dashes, and ground pounds — every move feels tight and
+                        responsive.</p>
                 </div>
-                <div class="feature-card" id="feature-worlds">
-                    <div class="feature-icon">🌍</div>
-                    <h3>6 Unique Biomes</h3>
-                    <p>Tropical beaches, dense jungles, rocky cliffs, charming villages, open ocean, and fiery volcanic
-                        islands — each with its own style.</p>
-                </div>
-                <div class="feature-card" id="feature-levels">
-                    <div class="feature-icon">🗺️</div>
-                    <h3>60 Handcrafted Levels</h3>
-                    <p>Every level is designed with increasing complexity and beauty. The further you go, the more
-                        elaborate the world becomes.</p>
-                </div>
-                <div class="feature-card" id="feature-collectibles">
-                    <div class="feature-icon">💰</div>
-                    <h3>Coins & Jade</h3>
-                    <p>Collect golden coins and rare jade to unlock secrets. Chase three-star ratings on every level for
-                        completionists.</p>
-                </div>
-                <div class="feature-card" id="feature-visuals">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Cel-Shaded Beauty</h3>
-                    <p>Custom toon shaders, stylized water, aurora skies, and lava effects bring this world to life with
-                        a gorgeous art style.</p>
-                </div>
-                <div class="feature-card" id="feature-wind">
+                <div class="feature-card" data-animate="fade-up" data-delay="1">
                     <div class="feature-icon">🌬️</div>
                     <h3>Phase Shift</h3>
-                    <p>Transform into a wind spirit to phase through walls, discover hidden paths, and see the world
-                        from a whole new perspective.</p>
+                    <p>Transform into a wind spirit. Pass through walls, reveal hidden paths, and see a secret layer of
+                        the world.</p>
+                </div>
+                <div class="feature-card" data-animate="fade-up" data-delay="2">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Cel-Shaded Beauty</h3>
+                    <p>Custom toon shaders, stylized water, aurora skies, and lava effects — every biome is a visual
+                        treat.</p>
+                </div>
+                <div class="feature-card" data-animate="fade-up" data-delay="3">
+                    <div class="feature-icon">💎</div>
+                    <h3>Collectibles & Secrets</h3>
+                    <p>Golden coins, jade collectibles, three-star ratings, and hidden Easter eggs for the
+                        completionists.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Worlds Section -->
-    <section id="worlds">
-        <div class="section-inner">
-            <div class="section-header">
+    <!-- ═══ Worlds ═══ -->
+    <section id="worlds" class="section">
+        <div class="container">
+            <div class="section-header" data-animate="fade-up">
                 <span class="section-label">Explore</span>
-                <h2>Discover the Worlds</h2>
+                <h2>Six <span class="text-gradient">Breathtaking Biomes</span></h2>
             </div>
-            <div class="worlds-showcase">
-                <div class="world-card active" id="world-tropical" data-world="tropical">
-                    <div class="world-card-bg" style="background-image: url('images/image.png')"></div>
-                    <div class="world-card-content">
-                        <span class="world-number">World 01</span>
+            <div class="worlds-grid">
+                <div class="world-card" data-animate="fade-up" data-delay="0">
+                    <div class="world-img-wrapper">
+                        <img src="images/image2.png" alt="Floating Islands" loading="lazy">
+                    </div>
+                    <div class="world-info">
+                        <span class="world-number">01</span>
                         <h3>Tropical Beach</h3>
-                        <p>Sun-kissed shores, swaying palm trees, and gentle ocean breezes. Your adventure begins here
-                            among coral reefs and sandy dunes.</p>
-                        <div class="world-stats">
-                            <span>10 Levels</span>
-                            <span>🌴 Palm Trees</span>
-                            <span>🪸 Coral Reefs</span>
-                        </div>
+                        <p>Sun-kissed shores, coral reefs, and the first taste of wind-powered flight.</p>
                     </div>
                 </div>
-                <div class="world-card" id="world-jungle" data-world="jungle">
-                    <div class="world-card-bg" style="background-image: url('images/image.png')"></div>
-                    <div class="world-card-content">
-                        <span class="world-number">World 02</span>
+                <div class="world-card" data-animate="fade-up" data-delay="1">
+                    <div class="world-img-wrapper">
+                        <img src="images/image.png" alt="Glimwood Deep" loading="lazy">
+                    </div>
+                    <div class="world-info">
+                        <span class="world-number">02</span>
                         <h3>Dense Jungle</h3>
-                        <p>Ancient trees tower above a canopy of mystery. Glowing mushrooms light hidden paths through
-                            the dense undergrowth.</p>
-                        <div class="world-stats">
-                            <span>10 Levels</span>
-                            <span>🍄 Mushrooms</span>
-                            <span>🌿 Vines</span>
-                        </div>
+                        <p>Towering ancient trees, bioluminescent mushrooms, and hidden ruins.</p>
                     </div>
                 </div>
-                <div class="world-card" id="world-cliff" data-world="cliff">
-                    <div class="world-card-bg" style="background-image: url('images/3.png')"></div>
-                    <div class="world-card-content">
-                        <span class="world-number">World 03</span>
+                <div class="world-card" data-animate="fade-up" data-delay="2">
+                    <div class="world-img-wrapper">
+                        <img src="images/3.png" alt="Asteroid Belt" loading="lazy">
+                    </div>
+                    <div class="world-info">
+                        <span class="world-number">03</span>
                         <h3>Frostbite Peaks</h3>
-                        <p>Crystal ice formations and aurora-lit skies. Navigate slippery surfaces and frozen waterfalls
-                            in this winter wonderland.</p>
-                        <div class="world-stats">
-                            <span>10 Levels</span>
-                            <span>❄️ Ice Crystals</span>
-                            <span>🌌 Aurora</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="world-card" id="world-village" data-world="village">
-                    <div class="world-card-bg" style="background-image: url('images/image2.png')"></div>
-                    <div class="world-card-content">
-                        <span class="world-number">World 04</span>
-                        <h3>Windfall Village</h3>
-                        <p>A cozy settlement floating among the clouds. Barrels, crates, and lantern-lit pathways hold
-                            secrets in every corner.</p>
-                        <div class="world-stats">
-                            <span>10 Levels</span>
-                            <span>🏮 Lanterns</span>
-                            <span>📜 Signposts</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="world-card" id="world-ocean" data-world="ocean">
-                    <div class="world-card-bg" style="background-image: url('images/3.png')"></div>
-                    <div class="world-card-content">
-                        <span class="world-number">World 05</span>
-                        <h3>Cosmos Ocean</h3>
-                        <p>Sail the starlit open waters. The boundaries between sky and sea blur in this ethereal,
-                            dreamlike biome.</p>
-                        <div class="world-stats">
-                            <span>10 Levels</span>
-                            <span>⭐ Starfields</span>
-                            <span>🌊 Waves</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="world-card" id="world-volcanic" data-world="volcanic">
-                    <div class="world-card-bg" style="background-image: url('images/image2.png')"></div>
-                    <div class="world-card-content">
-                        <span class="world-number">World 06</span>
-                        <h3>Inferno Peak</h3>
-                        <p>The ultimate challenge. Rivers of lava, erupting geysers, and platforms that crumble beneath
-                            your feet.</p>
-                        <div class="world-stats">
-                            <span>10 Levels</span>
-                            <span>🌋 Lava</span>
-                            <span>🔥 Geysers</span>
-                        </div>
+                        <p>Crystal ice formations, shimmering auroras, and treacherous frozen platforms.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section id="gallery">
-        <div class="section-inner">
-            <div class="section-header">
+    <!-- ═══ Gallery ═══ -->
+    <section id="gallery" class="section section-dark">
+        <div class="container">
+            <div class="section-header" data-animate="fade-up">
                 <span class="section-label">Screenshots</span>
-                <h2>See It In Action</h2>
+                <h2>See It <span class="text-gradient">In Action</span></h2>
             </div>
             <div class="gallery-grid">
-                <div class="gallery-item" id="gallery-1">
+                <div class="gallery-item" data-animate="fade-up" data-delay="0">
                     <img src="images/title-screen.png" alt="Winds Awaken Title Screen" loading="lazy">
                     <div class="gallery-caption">Title Screen</div>
                 </div>
-                <div class="gallery-item" id="gallery-2">
+                <div class="gallery-item" data-animate="fade-up" data-delay="1">
                     <img src="images/image2.png" alt="Floating Islands Overview" loading="lazy">
                     <div class="gallery-caption">Floating Islands — World Overview</div>
                 </div>
-                <div class="gallery-item" id="gallery-3">
+                <div class="gallery-item" data-animate="fade-up" data-delay="2">
                     <img src="images/image.png" alt="Glimwood Deep — Level 8" loading="lazy">
                     <div class="gallery-caption">Glimwood Deep — Level 8</div>
                 </div>
-                <div class="gallery-item" id="gallery-4">
+                <div class="gallery-item" data-animate="fade-up" data-delay="3">
                     <img src="images/3.png" alt="Asteroid Belt — Level 21" loading="lazy">
                     <div class="gallery-caption">Asteroid Belt — Level 21</div>
                 </div>
-                <div class="gallery-item gallery-wide" id="gallery-5">
-                    <img src="images/menu_bg.png" alt="Winds Awaken — Title Screen View" loading="lazy">
+                <div class="gallery-item gallery-wide" data-animate="fade-up" data-delay="4">
+                    <img src="images/menu_bg.png" alt="The World of Winds Awaken" loading="lazy">
                     <div class="gallery-caption">The World of Winds Awaken</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Lightbox -->
+    <!-- ═══ Buy / Coming Soon ═══ -->
+    <section id="buy" class="section">
+        <div class="container">
+            <div class="buy-card" data-animate="fade-up">
+                <div class="buy-glow"></div>
+                <img src="images/game_logo.png" alt="Winds Awaken" class="buy-logo">
+                <h2>Coming Soon — <span class="text-gradient">$5</span></h2>
+                <p class="buy-desc">Full game. 60 levels. 6 biomes. Windows, Mac & Linux. DRM-free. All future updates
+                    included.</p>
+                <div class="buy-features">
+                    <span>✅ 60 Handcrafted Levels</span>
+                    <span>✅ All 6 Biomes</span>
+                    <span>✅ Cross-Platform</span>
+                    <span>✅ DRM-Free</span>
+                    <span>✅ Free Updates</span>
+                    <span>✅ Support Indie Dev</span>
+                </div>
+                <a href="#newsletter" class="btn btn-primary btn-lg">🔔 Get Notified at Launch</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Newsletter ═══ -->
+    <section id="newsletter" class="section section-dark">
+        <div class="container container-sm">
+            <div class="newsletter-card" data-animate="fade-up">
+                <h2>Stay in the <span class="text-gradient">Loop</span></h2>
+                <p>Be the first to know when Winds Awaken launches. No spam, just the good stuff.</p>
+                <form id="newsletter-form" class="newsletter-form">
+                    <input type="email" id="newsletter-email" placeholder="your@email.com" required>
+                    <button type="submit" id="newsletter-submit" class="btn btn-primary">Notify Me</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Lightbox ═══ -->
     <div class="lightbox" id="lightbox">
-        <button class="lightbox-close" id="lightbox-close" aria-label="Close lightbox">&times;</button>
-        <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous image">&#8249;</button>
-        <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next image">&#8250;</button>
+        <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous">&#8249;</button>
+        <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next">&#8250;</button>
         <img src="" alt="" class="lightbox-img" id="lightbox-img">
         <div class="lightbox-caption" id="lightbox-caption"></div>
     </div>
 
-    <!-- Buy Section -->
-    <section id="buy">
-        <div class="section-inner">
-            <div class="buy-container">
-                <div class="buy-visual">
-                    <img src="images/game_logo.png" alt="Winds Awaken" class="buy-logo">
-                    <div class="buy-glow"></div>
+    <!-- ═══ Cursor Glow ═══ -->
+    <div id="cursor-glow"></div>
+
+    <!-- ═══ Footer ═══ -->
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <img src="images/game_logo.png" alt="Winds Awaken" class="footer-logo">
+                    <p>A cel-shaded ocean adventure.<br>Made with 💚 and Godot Engine.</p>
                 </div>
-                <div class="buy-content">
-                    <span class="section-label">Coming Soon</span>
-                    <h2>Winds Awaken</h2>
-                    <div class="price-tag">
-                        <span class="price-amount">$5</span>
-                        <span class="price-note">One-time purchase. No DRM. All future updates included.</span>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>Game</h4>
+                        <a href="#about">About</a>
+                        <a href="#features">Features</a>
+                        <a href="#worlds">Worlds</a>
+                        <a href="#gallery">Screenshots</a>
                     </div>
-                    <ul class="buy-includes">
-                        <li>✅ Full game — 60 levels, 6 biomes</li>
-                        <li>✅ Windows, Mac & Linux builds</li>
-                        <li>✅ DRM-free download</li>
-                        <li>✅ All future updates free</li>
-                        <li>✅ Supports an indie developer</li>
-                    </ul>
-                    <div class="buy-buttons">
-                        <a href="#newsletter" class="btn btn-primary btn-lg" id="buy-notify-btn">
-                            <span class="btn-icon">🔔</span>
-                            Get Notified at Launch
-                        </a>
-                        <p class="buy-itch-note">Available soon on Itch.io — Windows, Mac & Linux</p>
-                        <!-- 
-                            When ready to sell, replace the button above with Itch.io embed widget:
-                            <iframe frameborder="0" src="https://itch.io/embed/YOUR_GAME_ID?dark=true" 
-                                width="552" height="167">
-                                <a href="https://ericdataplus.itch.io/winds-awaken">
-                                    Winds Awaken
-                                </a>
-                            </iframe>
-                        -->
+                    <div class="footer-col">
+                        <h4>Buy</h4>
+                        <a href="#buy">Itch.io</a>
+                        <a href="#buy">Steam (Coming Soon)</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Connect</h4>
+                        <a href="https://github.com/Ericdataplus" target="_blank" rel="noopener">GitHub</a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Newsletter / Wishlist -->
-    <section id="newsletter">
-        <div class="section-inner">
-            <div class="newsletter-container">
-                <h2>Stay in the Loop</h2>
-                <p>Get notified about release dates, updates, and behind-the-scenes development.</p>
-                <form class="newsletter-form" id="newsletter-form">
-                    <input type="email" placeholder="your@email.com" class="newsletter-input" id="newsletter-email"
-                        required>
-                    <button type="submit" class="btn btn-primary" id="newsletter-submit">Notify Me</button>
-                </form>
-                <p class="newsletter-note">No spam, ever. Unsubscribe anytime.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="footer">
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <img src="images/game_logo.png" alt="Winds Awaken" class="footer-logo">
-                <p>A cel-shaded ocean adventure.<br>Made with 💚 and Godot Engine.</p>
-            </div>
-            <div class="footer-links">
-                <div class="footer-col">
-                    <h4>Game</h4>
-                    <a href="#about">About</a>
-                    <a href="#features">Features</a>
-                    <a href="#worlds">Worlds</a>
-                    <a href="#gallery">Screenshots</a>
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Winds Awaken. All rights reserved. | <a href="privacy.html">Privacy</a> | <a
+                            href="terms.html">Terms & EULA</a> | <a href="refund.html">Refund Policy</a></p>
                 </div>
-                <div class="footer-col">
-                    <h4>Buy</h4>
-                    <a href="#buy">Itch.io</a>
-                    <a href="#buy">Steam (Coming Soon)</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Connect</h4>
-                    <a href="https://github.com/Ericdataplus" target="_blank" rel="noopener">GitHub</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Winds Awaken. All rights reserved. | <a href="privacy.html">Privacy</a> | <a
-                        href="terms.html">Terms & EULA</a> | <a href="refund.html">Refund Policy</a></p>
             </div>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- ═══ Libraries ═══ -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- ═══ Main Script (Module for Three.js imports) ═══ -->
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>
