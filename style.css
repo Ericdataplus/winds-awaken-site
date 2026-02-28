@@ -1218,6 +1218,60 @@ section {
     transform: translateX(0);
 }
 
+/* ─── Custom Cursor Glow ─────────────────────────────── */
+#cursor-glow {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26, 255, 204, 0.4), transparent 70%);
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: screen;
+}
+
+#cursor-glow.cursor-hover {
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, rgba(26, 255, 204, 0.5), rgba(240, 200, 80, 0.15) 50%, transparent 70%);
+}
+
+#cursor-trail {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26, 255, 204, 0.06), transparent 70%);
+    pointer-events: none;
+    z-index: 9997;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+}
+
+/* ─── Character Text Reveal ──────────────────────────── */
+.char-reveal {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px) rotateX(40deg);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition-delay: calc(var(--char-index) * 0.03s);
+}
+
+.chars-visible .char-reveal {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+}
+
+/* Keep the gradient text also on spans */
+.section-header h2 .char-reveal {
+    background: linear-gradient(135deg, var(--clr-text), var(--clr-primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
 /* ─── Premium Enhancements ───────────────────────────── */
 
 /* Animated gradient border on buy section */
