@@ -368,9 +368,6 @@ img {
     margin: 0 auto var(--space-md);
     filter: drop-shadow(0 0 40px var(--clr-primary-glow));
     animation: logoFloat 6s ease-in-out infinite;
-    background: var(--clr-bg-deep);
-    border-radius: var(--radius-md);
-    padding: 10px;
 }
 
 @keyframes logoFloat {
@@ -939,9 +936,6 @@ section {
     width: 280px;
     filter: drop-shadow(0 0 50px var(--clr-primary-glow));
     animation: logoFloat 6s ease-in-out infinite;
-    background: var(--clr-bg-deep);
-    border-radius: var(--radius-md);
-    padding: 8px;
 }
 
 .buy-glow {
@@ -1122,9 +1116,6 @@ section {
 .footer-logo {
     width: 80px;
     opacity: 0.7;
-    background: var(--clr-bg-deep);
-    border-radius: var(--radius-sm);
-    padding: 4px;
 }
 
 .footer-brand p {
