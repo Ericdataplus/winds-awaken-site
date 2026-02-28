@@ -363,11 +363,32 @@ img {
 }
 
 .hero-logo {
-    width: 380px;
-    max-width: 80vw;
+    width: 420px;
+    max-width: 85vw;
     margin: 0 auto var(--space-md);
-    filter: drop-shadow(0 0 40px var(--clr-primary-glow));
-    animation: logoFloat 6s ease-in-out infinite;
+    animation: logoFloat 6s ease-in-out infinite, bioGlow 4s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
+}
+
+/* Bioluminescent glow animation */
+@keyframes bioGlow {
+
+    0%,
+    100% {
+        filter:
+            drop-shadow(0 0 15px rgba(26, 255, 204, 0.4)) drop-shadow(0 0 40px rgba(26, 255, 204, 0.15)) drop-shadow(0 0 80px rgba(26, 255, 204, 0.05));
+    }
+
+    33% {
+        filter:
+            drop-shadow(0 0 20px rgba(0, 220, 255, 0.5)) drop-shadow(0 0 50px rgba(0, 220, 255, 0.2)) drop-shadow(0 0 100px rgba(26, 255, 204, 0.1));
+    }
+
+    66% {
+        filter:
+            drop-shadow(0 0 18px rgba(240, 200, 80, 0.35)) drop-shadow(0 0 45px rgba(26, 255, 204, 0.2)) drop-shadow(0 0 90px rgba(0, 180, 255, 0.08));
+    }
 }
 
 @keyframes logoFloat {
@@ -934,8 +955,7 @@ section {
 
 .buy-logo {
     width: 280px;
-    filter: drop-shadow(0 0 50px var(--clr-primary-glow));
-    animation: logoFloat 6s ease-in-out infinite;
+    animation: logoFloat 6s ease-in-out infinite, bioGlow 4s ease-in-out infinite;
 }
 
 .buy-glow {
